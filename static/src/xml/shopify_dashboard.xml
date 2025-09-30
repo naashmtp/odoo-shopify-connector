@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="shopify_integration.Dashboard" owl="1">
+        <div class="shopify_dashboard">
+            <div class="container">
+                <!-- Header -->
+                <div class="shopify_dashboard_header">
+                    <h1>Shopify Dashboard</h1>
+                    <p class="shopify_dashboard_subtitle">
+                        Vue d'ensemble de vos intégrations Shopify
+                    </p>
+                </div>
+
+                <!-- Loading State -->
+                <div t-if="state.loading" class="shopify_loading">
+                    <div class="shopify_loading_spinner"/>
+                </div>
+
+                <!-- Main Content -->
+                <div t-else="">
+                    <!-- Stats Grid -->
+                    <div class="shopify_stats_grid">
+                        <div class="shopify_stat_card" t-on-click="() => this.openOrders()">
+                            <div class="shopify_stat_card_header">
+                                <span class="shopify_stat_card_title">Commandes</span>
+                                <span class="shopify_stat_card_icon">🛒</span>
+                            </div>
+                            <div class="shopify_stat_card_value">
+                                <t t-esc="state.stats.total_orders"/>
+                            </div>
+                            <div class="shopify_stat_card_label">
+                                <t t-esc="state.stats.orders_today"/> aujourd'hui
+                            </div>
+                        </div>
+
+                        <div class="shopify_stat_card" t-on-click="() => this.openProducts()">
+                            <div class="shopify_stat_card_header">
+                                <span class="shopify_stat_card_title">Produits</span>
+                                <span class="shopify_stat_card_icon">📦</span>
+                            </div>
+                            <div class="shopify_stat_card_value">
+                                <t t-esc="state.stats.total_products"/>
+                            </div>
+                            <div class="shopify_stat_card_label">
+                                <t t-esc="state.stats.sync_products"/> synchronisés
+                            </div>
+                        </div>
+
+                        <div class="shopify_stat_card">
+                            <div class="shopify_stat_card_header">
+                                <span class="shopify_stat_card_title">Clients</span>
+                                <span class="shopify_stat_card_icon">👥</span>
+                            </div>
+                            <div class="shopify_stat_card_value">
+                                <t t-esc="state.stats.total_customers"/>
+                            </div>
+                            <div class="shopify_stat_card_label">clients actifs</div>
+                        </div>
+
+                        <div class="shopify_stat_card">
+                            <div class="shopify_stat_card_header">
+                                <span class="shopify_stat_card_title">Chiffre d'Affaires</span>
+                                <span class="shopify_stat_card_icon">💰</span>
+                            </div>
+                            <div class="shopify_stat_card_value">
+                                <t t-esc="formatCurrency(state.stats.total_revenue)"/>
+                            </div>
+                            <div class="shopify_stat_card_label">ce mois</div>
+                        </div>
+
+                        <div class="shopify_stat_card" t-on-click="() => this.openQueue()">
+                            <div class="shopify_stat_card_header">
+                                <span class="shopify_stat_card_title">File d'Attente</span>
+                                <span class="shopify_stat_card_icon">⏳</span>
+                            </div>
+                            <div class="shopify_stat_card_value">
+                                <t t-esc="state.stats.pending_queue"/>
+                            </div>
+                            <div class="shopify_stat_card_label">en attente</div>
+                        </div>
+
+                        <div class="shopify_stat_card" t-on-click="() => this.openLogs()">
+                            <div class="shopify_stat_card_header">
+                                <span class="shopify_stat_card_title">Erreurs</span>
+                                <span class="shopify_stat_card_icon">⚠️</span>
+                            </div>
+                            <div class="shopify_stat_card_value">
+                                <t t-esc="state.stats.failed_jobs"/>
+                            </div>
+                            <div class="shopify_stat_card_label">jobs échoués</div>
+                        </div>
+                    </div>
+
+                    <!-- Instances -->
+                    <h2 style="margin: 40px 0 20px 0; font-size: 24px; font-weight: 600;">
+                        Instances Shopify
+                    </h2>
+
+                    <div t-if="state.instances.length === 0" class="shopify_empty_state">
+                        <div class="shopify_empty_state_icon">🏪</div>
+                        <div class="shopify_empty_state_title">Aucune instance configurée</div>
+                        <div class="shopify_empty_state_text">
+                            Configurez votre première instance Shopify pour commencer
+                        </div>
+                    </div>
+
+                    <div t-else="" class="shopify_instances_grid">
+                        <div t-foreach="state.instances" t-as="instance" t-key="instance.id"
+                             class="shopify_instance_card">
+                            <div class="shopify_instance_card_header">
+                                <div>
+                                    <div class="shopify_instance_card_title">
+                                        <t t-esc="instance.name"/>
+                                    </div>
+                                    <div class="shopify_instance_card_url">
+                                        <t t-esc="instance.shop_url"/>
+                                    </div>
+                                </div>
+                                <span t-attf-class="shopify_badge badge-{{ getStatusClass(instance.state) }}">
+                                    <t t-esc="instance.state"/>
+                                </span>
+                            </div>
+                            <div class="shopify_instance_card_actions">
+                                <button class="shopify_btn shopify_btn_primary shopify_btn_sm"
+                                        t-on-click="() => this.syncNow(instance.id)">
+                                    🔄 Synchroniser
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders -->
+                    <div class="shopify_recent_section" style="margin-top: 30px;">
+                        <h3>Commandes Récentes</h3>
+
+                        <div t-if="state.recent_orders.length === 0" class="shopify_empty_state">
+                            <div class="shopify_empty_state_text">Aucune commande récente</div>
+                        </div>
+
+                        <div t-else="">
+                            <div t-foreach="state.recent_orders" t-as="order" t-key="order.id"
+                                 class="shopify_recent_item">
+                                <div class="shopify_recent_item_main">
+                                    <div class="shopify_recent_item_title">
+                                        <t t-esc="order.name"/>
+                                    </div>
+                                    <div class="shopify_recent_item_subtitle">
+                                        <t t-esc="formatDate(order.order_date)"/> •
+                                        <span t-attf-class="shopify_badge badge-{{ order.financial_status === 'paid' ? 'success' : 'warning' }}">
+                                            <t t-esc="order.financial_status"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="shopify_recent_item_value">
+                                    <t t-esc="formatCurrency(order.total_price)"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Logs -->
+                    <div class="shopify_recent_section" style="margin-top: 30px;">
+                        <h3>Logs Récents</h3>
+
+                        <div t-if="state.recent_logs.length === 0" class="shopify_empty_state">
+                            <div class="shopify_empty_state_text">Aucun log récent</div>
+                        </div>
+
+                        <div t-else="">
+                            <div t-foreach="state.recent_logs" t-as="log" t-key="log.id"
+                                 t-attf-class="shopify_log_entry log-{{ log.level }}">
+                                <div class="shopify_log_entry_message">
+                                    <span t-attf-class="shopify_badge shopify_badge_sm badge-{{ getLogLevelClass(log.level) }}">
+                                        <t t-esc="log.level"/>
+                                    </span>
+                                    <t t-esc="log.message"/>
+                                </div>
+                                <div class="shopify_log_entry_meta">
+                                    <t t-esc="log.model_name"/> • <t t-esc="formatDate(log.create_date)"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

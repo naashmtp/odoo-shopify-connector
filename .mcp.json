@@ -1,0 +1,54 @@
+{
+  "servers": {
+    "github": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-filesystem",
+        "/root/dev/my-projects/odoo/shopify-integration"
+      ]
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "${POSTGRES_URL}"
+      }
+    },
+    "playwright": {
+      "command": "node",
+      "args": ["node_modules/@microsoft/playwright-mcp/dist/index.js"],
+      "env": {}
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-sqlite",
+        "--db-path",
+        "./data.db"
+      ]
+    },
+    "docker": {
+      "command": "npx",
+      "args": ["@punkpeye/mcp-server-docker"]
+    },
+    "python-exec": {
+      "command": "python",
+      "args": ["-m", "pydantic_ai_mcp_server"],
+      "env": {}
+    }
+  }
+}

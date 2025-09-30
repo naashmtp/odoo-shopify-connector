@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Queue Job Channel for Shopify Operations -->
+        <record id="channel_shopify" model="queue.job.channel">
+            <field name="name">shopify</field>
+            <field name="parent_id" ref="queue_job.channel_root"/>
+            <field name="capacity">10</field>
+        </record>
+
+        <!-- Channel for Product Operations -->
+        <record id="channel_shopify_products" model="queue.job.channel">
+            <field name="name">shopify.products</field>
+            <field name="parent_id" ref="channel_shopify"/>
+            <field name="capacity">5</field>
+        </record>
+
+        <!-- Channel for Order Operations -->
+        <record id="channel_shopify_orders" model="queue.job.channel">
+            <field name="name">shopify.orders</field>
+            <field name="parent_id" ref="channel_shopify"/>
+            <field name="capacity">5</field>
+        </record>
+
+        <!-- Channel for Customer Operations -->
+        <record id="channel_shopify_customers" model="queue.job.channel">
+            <field name="name">shopify.customers</field>
+            <field name="parent_id" ref="channel_shopify"/>
+            <field name="capacity">3</field>
+        </record>
+
+        <!-- Channel for Stock Sync Operations -->
+        <record id="channel_shopify_stock" model="queue.job.channel">
+            <field name="name">shopify.stock</field>
+            <field name="parent_id" ref="channel_shopify"/>
+            <field name="capacity">3</field>
+        </record>
+
+        <!-- Channel for Webhook Processing -->
+        <record id="channel_shopify_webhooks" model="queue.job.channel">
+            <field name="name">shopify.webhooks</field>
+            <field name="parent_id" ref="channel_shopify"/>
+            <field name="capacity">10</field>
+        </record>
+
+        <!-- Queue Job Function: Import Products -->
+        <record id="queue_job_function_import_products" model="queue.job.function">
+            <field name="name">Import Products from Shopify</field>
+            <field name="channel_id" ref="channel_shopify_products"/>
+            <field name="model_id" ref="model_shopify_instance"/>
+            <field name="method">import_shopify_products</field>
+            <field name="retry_pattern">{1: 60, 2: 180, 3: 600}</field>
+            <field name="related_action">related_action_open_instance</field>
+        </record>
+
+        <!-- Queue Job Function: Import Orders -->
+        <record id="queue_job_function_import_orders" model="queue.job.function">
+            <field name="name">Import Orders from Shopify</field>
+            <field name="channel_id" ref="channel_shopify_orders"/>
+            <field name="model_id" ref="model_shopify_instance"/>
+            <field name="method">import_shopify_orders</field>
+            <field name="retry_pattern">{1: 60, 2: 180, 3: 600}</field>
+            <field name="related_action">related_action_open_instance</field>
+        </record>
+
+        <!-- Queue Job Function: Import Customers -->
+        <record id="queue_job_function_import_customers" model="queue.job.function">
+            <field name="name">Import Customers from Shopify</field>
+            <field name="channel_id" ref="channel_shopify_customers"/>
+            <field name="model_id" ref="model_shopify_instance"/>
+            <field name="method">import_shopify_customers</field>
+            <field name="retry_pattern">{1: 60, 2: 180, 3: 600}</field>
+            <field name="related_action">related_action_open_instance</field>
+        </record>
+
+        <!-- Queue Job Function: Sync Stock -->
+        <record id="queue_job_function_sync_stock" model="queue.job.function">
+            <field name="name">Sync Stock Levels</field>
+            <field name="channel_id" ref="channel_shopify_stock"/>
+            <field name="model_id" ref="model_shopify_product"/>
+            <field name="method">sync_stock_levels</field>
+            <field name="retry_pattern">{1: 30, 2: 120, 3: 300}</field>
+            <field name="related_action">related_action_open_product</field>
+        </record>
+
+        <!-- Queue Job Function: Process Webhook -->
+        <record id="queue_job_function_process_webhook" model="queue.job.function">
+            <field name="name">Process Shopify Webhook</field>
+            <field name="channel_id" ref="channel_shopify_webhooks"/>
+            <field name="model_id" ref="model_shopify_webhook"/>
+            <field name="method">process_webhook</field>
+            <field name="retry_pattern">{1: 10, 2: 60, 3: 180}</field>
+            <field name="related_action">related_action_open_webhook</field>
+        </record>
+
+        <!-- Queue Job Function: Export Product -->
+        <record id="queue_job_function_export_product" model="queue.job.function">
+            <field name="name">Export Product to Shopify</field>
+            <field name="channel_id" ref="channel_shopify_products"/>
+            <field name="model_id" ref="model_shopify_product"/>
+            <field name="method">export_to_shopify</field>
+            <field name="retry_pattern">{1: 60, 2: 180, 3: 600}</field>
+            <field name="related_action">related_action_open_product</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Shopify Log Tree View -->
+    <record id="view_shopify_log_tree" model="ir.ui.view">
+        <field name="name">shopify.log.tree</field>
+        <field name="model">shopify.log</field>
+        <field name="arch" type="xml">
+            <tree string="Shopify Logs" decoration-success="status == 'success'" decoration-danger="status == 'error'" decoration-warning="status == 'warning'" decoration-info="status == 'info'">
+                <field name="create_date"/>
+                <field name="instance_id"/>
+                <field name="operation"/>
+                <field name="status"/>
+                <field name="message"/>
+                <field name="http_status"/>
+                <field name="execution_time"/>
+                <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Shopify Log Form View -->
+    <record id="view_shopify_log_form" model="ir.ui.view">
+        <field name="name">shopify.log.form</field>
+        <field name="model">shopify.log</field>
+        <field name="arch" type="xml">
+            <form string="Shopify Log" create="false" edit="false">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_related_record" type="object" string="View Related" class="oe_stat_button" icon="fa-external-link" attrs="{'invisible': ['|', ('related_model', '=', False), ('related_record_id', '=', 0)]}"/>
+                        <button name="action_retry_operation" type="object" string="Retry Operation" class="oe_stat_button" icon="fa-refresh" attrs="{'invisible': [('status', '!=', 'error')]}"/>
+                    </div>
+                    <group>
+                        <group name="main_info">
+                            <field name="instance_id"/>
+                            <field name="operation"/>
+                            <field name="status" widget="badge" decoration-success="status == 'success'" decoration-danger="status == 'error'" decoration-warning="status == 'warning'"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group name="timing">
+                            <field name="create_date"/>
+                            <field name="execution_time" widget="float_time"/>
+                            <field name="memory_usage"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="message" colspan="2"/>
+                        <field name="details" colspan="2"/>
+                    </group>
+                    <notebook>
+                        <page string="API Details" name="api_details">
+                            <group>
+                                <group>
+                                    <field name="api_endpoint"/>
+                                    <field name="http_method"/>
+                                    <field name="http_status"/>
+                                </group>
+                                <group>
+                                    <field name="related_model"/>
+                                    <field name="related_record_id"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="request_data" widget="text"/>
+                                <field name="response_data" widget="text"/>
+                            </group>
+                        </page>
+                        <page string="Error Details" name="error_details" attrs="{'invisible': [('status', '!=', 'error')]}">
+                            <group>
+                                <field name="error_code"/>
+                                <field name="error_trace" widget="text"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Shopify Log Search View -->
+    <record id="view_shopify_log_search" model="ir.ui.view">
+        <field name="name">shopify.log.search</field>
+        <field name="model">shopify.log</field>
+        <field name="arch" type="xml">
+            <search string="Shopify Logs">
+                <field name="message"/>
+                <field name="operation"/>
+                <field name="instance_id"/>
+                <field name="api_endpoint"/>
+                <filter string="Success" name="filter_success" domain="[('status', '=', 'success')]"/>
+                <filter string="Errors" name="filter_error" domain="[('status', '=', 'error')]"/>
+                <filter string="Warnings" name="filter_warning" domain="[('status', '=', 'warning')]"/>
+                <filter string="Info" name="filter_info" domain="[('status', '=', 'info')]"/>
+                <separator/>
+                <filter string="API Requests" name="filter_api" domain="[('operation', '=', 'api_request')]"/>
+                <filter string="Product Operations" name="filter_product" domain="[('operation', 'in', ['product_import', 'product_export'])]"/>
+                <filter string="Order Operations" name="filter_order" domain="[('operation', 'in', ['order_import', 'order_export'])]"/>
+                <filter string="Customer Operations" name="filter_customer" domain="[('operation', 'in', ['customer_import', 'customer_export'])]"/>
+                <separator/>
+                <filter string="Today" name="filter_today" domain="[('create_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <filter string="Last 7 Days" name="filter_week" domain="[('create_date', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Instance" name="group_instance" context="{'group_by': 'instance_id'}"/>
+                    <filter string="Operation" name="group_operation" context="{'group_by': 'operation'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Shopify Log Graph View -->
+    <record id="view_shopify_log_graph" model="ir.ui.view">
+        <field name="name">shopify.log.graph</field>
+        <field name="model">shopify.log</field>
+        <field name="arch" type="xml">
+            <graph string="Shopify Log Statistics" type="bar">
+                <field name="operation"/>
+                <field name="status" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Shopify Log Pivot View -->
+    <record id="view_shopify_log_pivot" model="ir.ui.view">
+        <field name="name">shopify.log.pivot</field>
+        <field name="model">shopify.log</field>
+        <field name="arch" type="xml">
+            <pivot string="Shopify Log Analysis">
+                <field name="instance_id" type="row"/>
+                <field name="operation" type="row"/>
+                <field name="status" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Shopify Log Action -->
+    <record id="action_shopify_log" model="ir.actions.act_window">
+        <field name="name">Shopify Logs</field>
+        <field name="res_model">shopify.log</field>
+        <field name="view_mode">tree,form,graph,pivot</field>
+        <field name="context">{'search_default_filter_today': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No logs found. Logs will appear here after Shopify operations.
+            </p>
+        </field>
+    </record>
+
+</odoo>

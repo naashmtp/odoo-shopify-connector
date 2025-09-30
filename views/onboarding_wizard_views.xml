@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Shopify Onboarding Wizard Form View -->
+        <record id="view_shopify_onboarding_wizard_form" model="ir.ui.view">
+            <field name="name">shopify.onboarding.wizard.form</field>
+            <field name="model">shopify.onboarding.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Shopify Setup Wizard">
+                    <header>
+                        <button name="action_previous" string="Previous" type="object"
+                                class="btn-secondary" attrs="{'invisible': [('step', '=', 'credentials')]}"/>
+                        <button name="action_next" string="Next" type="object"
+                                class="btn-primary" attrs="{'invisible': [('step', '=', 'webhooks')]}"/>
+                        <button name="action_finish" string="Finish" type="object"
+                                class="btn-success" attrs="{'invisible': [('step', '!=', 'webhooks')]}"/>
+                        <button name="action_test_connection" string="Test Connection" type="object"
+                                class="btn-info" attrs="{'invisible': [('step', '!=', 'credentials')]}"/>
+                        <field name="step" widget="statusbar" statusbar_visible="credentials,configuration,mapping,webhooks"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <span attrs="{'invisible': [('step', '!=', 'credentials')]}">API Credentials</span>
+                                <span attrs="{'invisible': [('step', '!=', 'configuration')]}">Configuration</span>
+                                <span attrs="{'invisible': [('step', '!=', 'mapping')]}">Default Mapping</span>
+                                <span attrs="{'invisible': [('step', '!=', 'webhooks')]}">Webhooks Setup</span>
+                            </h1>
+                        </div>
+
+                        <!-- Step 1: Credentials -->
+                        <group attrs="{'invisible': [('step', '!=', 'credentials')]}">
+                            <group>
+                                <field name="name" placeholder="e.g., My Shopify Store"/>
+                                <field name="shop_url" placeholder="myshop.myshopify.com"/>
+                            </group>
+                            <group>
+                                <field name="api_key" password="True"/>
+                                <field name="api_secret" password="True"/>
+                                <field name="access_token" password="True"/>
+                            </group>
+                            <group colspan="2">
+                                <div class="alert alert-info" role="alert">
+                                    <p><strong>How to get your API credentials:</strong></p>
+                                    <ol>
+                                        <li>Go to your Shopify admin panel</li>
+                                        <li>Navigate to Apps &gt; Manage private apps</li>
+                                        <li>Create a new private app or use an existing one</li>
+                                        <li>Copy the API Key, API Secret, and Access Token</li>
+                                    </ol>
+                                </div>
+                            </group>
+                        </group>
+
+                        <!-- Step 2: Configuration -->
+                        <group attrs="{'invisible': [('step', '!=', 'configuration')]}">
+                            <group string="Automatic Operations">
+                                <field name="auto_import_orders"/>
+                                <field name="auto_import_products"/>
+                                <field name="auto_import_customers"/>
+                            </group>
+                            <group string="Synchronization">
+                                <field name="auto_sync_stock"/>
+                                <field name="auto_create_invoices"/>
+                            </group>
+                            <group colspan="2">
+                                <div class="alert alert-info" role="alert">
+                                    <p>These settings control automatic synchronization between Shopify and Odoo.
+                                       You can change them later in the instance configuration.</p>
+                                </div>
+                            </group>
+                        </group>
+
+                        <!-- Step 3: Mapping -->
+                        <group attrs="{'invisible': [('step', '!=', 'mapping')]}">
+                            <group string="Default Configuration">
+                                <field name="warehouse_id" options="{'no_create': True}"/>
+                                <field name="pricelist_id" options="{'no_create': True}"/>
+                            </group>
+                            <group string="Sales Configuration">
+                                <field name="payment_term_id" options="{'no_create': True}"/>
+                                <field name="team_id" options="{'no_create': True}"/>
+                            </group>
+                            <group colspan="2">
+                                <div class="alert alert-info" role="alert">
+                                    <p>Configure default values for Shopify orders and products.
+                                       These settings will be used when creating records in Odoo.</p>
+                                </div>
+                            </group>
+                        </group>
+
+                        <!-- Step 4: Webhooks -->
+                        <group attrs="{'invisible': [('step', '!=', 'webhooks')]}">
+                            <group>
+                                <field name="setup_webhooks"/>
+                            </group>
+                            <group colspan="2">
+                                <div class="alert alert-info" role="alert">
+                                    <p><strong>About Webhooks:</strong></p>
+                                    <p>Webhooks allow real-time synchronization between Shopify and Odoo.
+                                       When enabled, Odoo will automatically receive notifications when:</p>
+                                    <ul>
+                                        <li>Orders are created or updated</li>
+                                        <li>Products are modified</li>
+                                        <li>Customers are created or updated</li>
+                                        <li>Inventory levels change</li>
+                                    </ul>
+                                    <p>Make sure your Odoo instance is accessible from the internet for webhooks to work.</p>
+                                </div>
+                            </group>
+                        </group>
+
+                        <field name="instance_id" invisible="1"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Wizard Action -->
+        <record id="action_shopify_onboarding_wizard" model="ir.actions.act_window">
+            <field name="name">Shopify Setup Wizard</field>
+            <field name="res_model">shopify.onboarding.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

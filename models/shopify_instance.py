@@ -28,6 +28,7 @@ class ShopifyInstance(models.Model):
 
     last_sync = fields.Datetime('Last Sync')
     is_active = fields.Boolean('Active', default=True)
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 
     # Configuration
     auto_import_orders = fields.Boolean('Auto Import Orders', default=True)
@@ -218,9 +219,33 @@ class ShopifyInstance(models.Model):
 
     def action_sync_all(self):
         """Sync all data from Shopify"""
-        self.with_delay().import_shopify_products()
-        self.with_delay().import_shopify_orders()
-        self.with_delay().import_shopify_customers()
+        # Create queue jobs for async processing
+        queue_obj = self.env['shopify.queue']
+
+        queue_obj.create({
+            'name': f'Import Products - {fields.Datetime.now()}',
+            'instance_id': self.id,
+            'operation': 'import_products',
+            'state': 'queued',
+            'data': json.dumps({'instance_id': self.id}),
+        })
+
+        queue_obj.create({
+            'name': f'Import Orders - {fields.Datetime.now()}',
+            'instance_id': self.id,
+            'operation': 'import_orders',
+            'state': 'queued',
+            'data': json.dumps({'instance_id': self.id}),
+        })
+
+        queue_obj.create({
+            'name': f'Import Customers - {fields.Datetime.now()}',
+            'instance_id': self.id,
+            'operation': 'import_customers',
+            'state': 'queued',
+            'data': json.dumps({'instance_id': self.id}),
+        })
+
         return True
 
     def import_shopify_products(self):
@@ -237,3 +262,93 @@ class ShopifyInstance(models.Model):
         """Import customers from Shopify"""
         # Implementation will be in shopify_customer model
         self.env['shopify.customer'].import_from_shopify(self)
+
+    @api.model
+    def get_dashboard_stats(self):
+        """Get dashboard statistics for all active instances"""
+        active_instances = self.search([('is_active', '=', True)])
+
+        ShopifyProduct = self.env['shopify.product']
+        ShopifyOrder = self.env['shopify.order']
+        ShopifyCustomer = self.env['shopify.customer']
+        ShopifyQueue = self.env['shopify.queue']
+        ShopifyLog = self.env['shopify.log']
+
+        # Get counts
+        total_products = ShopifyProduct.search_count([('instance_id', 'in', active_instances.ids)])
+        total_orders = ShopifyOrder.search_count([('instance_id', 'in', active_instances.ids)])
+        total_customers = ShopifyCustomer.search_count([('instance_id', 'in', active_instances.ids)])
+
+        # Pending orders (not imported in Odoo)
+        pending_orders = ShopifyOrder.search_count([
+            ('instance_id', 'in', active_instances.ids),
+            ('sale_order_id', '=', False)
+        ])
+
+        # Total revenue from paid orders
+        paid_orders = ShopifyOrder.search([
+            ('instance_id', 'in', active_instances.ids),
+            ('financial_status', '=', 'paid')
+        ])
+        total_revenue = sum(paid_orders.mapped('total_price'))
+
+        # Queue statistics
+        queued_jobs = ShopifyQueue.search_count([('state', '=', 'queued')])
+        failed_jobs = ShopifyQueue.search_count([('state', '=', 'failed')])
+
+        # Recent errors (last 24h)
+        from datetime import datetime, timedelta
+        yesterday = datetime.now() - timedelta(days=1)
+        recent_errors = ShopifyLog.search_count([
+            ('status', '=', 'error'),
+            ('create_date', '>=', yesterday)
+        ])
+
+        return {
+            'total_products': total_products,
+            'total_orders': total_orders,
+            'total_customers': total_customers,
+            'pending_orders': pending_orders,
+            'total_revenue': total_revenue,
+            'queued_jobs': queued_jobs,
+            'failed_jobs': failed_jobs,
+            'recent_errors': recent_errors,
+        }
+
+    @api.model
+    def get_recent_orders(self, limit=5):
+        """Get recent orders"""
+        ShopifyOrder = self.env['shopify.order']
+
+        orders = ShopifyOrder.search([
+            ('instance_id.is_active', '=', True)
+        ], order='shopify_created_at desc', limit=limit)
+
+        result = []
+        for order in orders:
+            result.append({
+                'name': order.name,
+                'total_price': order.total_price,
+                'financial_status': order.financial_status,
+                'shopify_created_at': order.shopify_created_at.isoformat() if order.shopify_created_at else None,
+            })
+
+        return result
+
+    @api.model
+    def get_recent_logs(self, limit=10):
+        """Get recent logs"""
+        ShopifyLog = self.env['shopify.log']
+
+        logs = ShopifyLog.search([], order='create_date desc', limit=limit)
+
+        result = []
+        for log in logs:
+            result.append({
+                'operation': log.operation,
+                'status': log.status,
+                'message': log.message,
+                'create_date': log.create_date.isoformat() if log.create_date else None,
+            })
+
+        return result

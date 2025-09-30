@@ -38,10 +38,9 @@
         'account',
         'payment',
         'website',
-        'queue_job',
     ],
     'external_dependencies': {
-        'python': ['requests', 'shopifyapi'],
+        'python': ['requests', 'shopifyapi'],  # queue_job is optional
     },
     'data': [
         'security/ir.model.access.csv',
@@ -54,15 +53,17 @@
         'views/shopify_customer_views.xml',
         'views/shopify_log_views.xml',
         'views/shopify_queue_views.xml',
+        'views/shopify_webhook_views.xml',
         'views/menu_views.xml',
-        'wizards/onboarding_wizard_views.xml',
-        'wizards/import_export_wizard_views.xml',
-        'wizards/sync_wizard_views.xml',
+        'views/onboarding_wizard_views.xml',
+        'views/import_export_wizard_views.xml',
+        'views/sync_wizard_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'shopify_integration/static/src/js/**/*',
             'shopify_integration/static/src/css/**/*',
+            'shopify_integration/static/src/xml/**/*',
         ],
     },
     'demo': [

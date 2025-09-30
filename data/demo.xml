@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Demo Shopify Instance -->
+        <record id="shopify_instance_demo" model="shopify.instance">
+            <field name="name">Demo Shopify Store</field>
+            <field name="shop_url">demo-store.myshopify.com</field>
+            <field name="api_key">demo_api_key_12345</field>
+            <field name="api_secret">demo_api_secret_67890</field>
+            <field name="access_token">shpat_demo_access_token</field>
+            <field name="webhook_secret">demo_webhook_secret</field>
+            <field name="state">draft</field>
+            <field name="is_active" eval="False"/>
+            <field name="auto_import_orders" eval="True"/>
+            <field name="auto_import_products" eval="False"/>
+            <field name="auto_import_customers" eval="True"/>
+            <field name="auto_sync_stock" eval="True"/>
+            <field name="auto_create_invoices" eval="True"/>
+            <field name="warehouse_id" ref="stock.warehouse0"/>
+            <field name="pricelist_id" ref="product.list0"/>
+        </record>
+
+        <!-- Demo Product Categories -->
+        <record id="product_category_demo_electronics" model="product.category">
+            <field name="name">Electronics (Demo)</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+
+        <record id="product_category_demo_clothing" model="product.category">
+            <field name="name">Clothing (Demo)</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+
+        <!-- Demo Odoo Products -->
+        <record id="product_template_demo_1" model="product.template">
+            <field name="name">Wireless Headphones</field>
+            <field name="type">product</field>
+            <field name="categ_id" ref="product_category_demo_electronics"/>
+            <field name="list_price">79.99</field>
+            <field name="standard_price">45.00</field>
+            <field name="default_code">WH-001</field>
+            <field name="description">High-quality wireless Bluetooth headphones with noise cancellation</field>
+        </record>
+
+        <record id="product_template_demo_2" model="product.template">
+            <field name="name">Cotton T-Shirt</field>
+            <field name="type">product</field>
+            <field name="categ_id" ref="product_category_demo_clothing"/>
+            <field name="list_price">24.99</field>
+            <field name="standard_price">12.00</field>
+            <field name="default_code">TS-001</field>
+            <field name="description">100% organic cotton t-shirt, available in multiple colors</field>
+        </record>
+
+        <record id="product_template_demo_3" model="product.template">
+            <field name="name">Stainless Steel Water Bottle</field>
+            <field name="type">product</field>
+            <field name="categ_id" ref="product.product_category_all"/>
+            <field name="list_price">29.99</field>
+            <field name="standard_price">15.00</field>
+            <field name="default_code">WB-001</field>
+            <field name="description">Insulated stainless steel water bottle, keeps drinks cold for 24h</field>
+        </record>
+
+        <!-- Demo Shopify Products -->
+        <record id="shopify_product_demo_1" model="shopify.product">
+            <field name="name">Wireless Headphones</field>
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="shopify_product_id">7234567890123</field>
+            <field name="product_tmpl_id" ref="product_template_demo_1"/>
+            <field name="default_code">WH-001</field>
+            <field name="shopify_price">79.99</field>
+            <field name="shopify_compare_price">99.99</field>
+            <field name="shopify_status">active</field>
+            <field name="sync_required" eval="False"/>
+            <field name="last_synced" eval="DateTime.now()"/>
+        </record>
+
+        <record id="shopify_product_demo_2" model="shopify.product">
+            <field name="name">Cotton T-Shirt</field>
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="shopify_product_id">7234567890124</field>
+            <field name="product_tmpl_id" ref="product_template_demo_2"/>
+            <field name="default_code">TS-001</field>
+            <field name="shopify_price">24.99</field>
+            <field name="shopify_status">active</field>
+            <field name="sync_required" eval="False"/>
+            <field name="last_synced" eval="DateTime.now()"/>
+        </record>
+
+        <record id="shopify_product_demo_3" model="shopify.product">
+            <field name="name">Stainless Steel Water Bottle</field>
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="shopify_product_id">7234567890125</field>
+            <field name="product_tmpl_id" ref="product_template_demo_3"/>
+            <field name="default_code">WB-001</field>
+            <field name="shopify_price">29.99</field>
+            <field name="shopify_status">active</field>
+            <field name="sync_required" eval="False"/>
+            <field name="last_synced" eval="DateTime.now()"/>
+        </record>
+
+        <!-- Demo Customers -->
+        <record id="res_partner_demo_customer_1" model="res.partner">
+            <field name="name">John Smith</field>
+            <field name="email">john.smith@example.com</field>
+            <field name="phone">+1 555-0101</field>
+            <field name="street">123 Main Street</field>
+            <field name="city">New York</field>
+            <field name="state_id" ref="base.state_us_27"/>
+            <field name="zip">10001</field>
+            <field name="country_id" ref="base.us"/>
+            <field name="customer_rank">1</field>
+        </record>
+
+        <record id="res_partner_demo_customer_2" model="res.partner">
+            <field name="name">Sarah Johnson</field>
+            <field name="email">sarah.johnson@example.com</field>
+            <field name="phone">+1 555-0102</field>
+            <field name="street">456 Oak Avenue</field>
+            <field name="city">Los Angeles</field>
+            <field name="state_id" ref="base.state_us_5"/>
+            <field name="zip">90001</field>
+            <field name="country_id" ref="base.us"/>
+            <field name="customer_rank">1</field>
+        </record>
+
+        <!-- Demo Shopify Customers -->
+        <record id="shopify_customer_demo_1" model="shopify.customer">
+            <field name="name">John Smith</field>
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="shopify_customer_id">6234567890123</field>
+            <field name="partner_id" ref="res_partner_demo_customer_1"/>
+            <field name="email">john.smith@example.com</field>
+            <field name="phone">+1 555-0101</field>
+            <field name="accepts_marketing" eval="True"/>
+            <field name="total_spent">154.98</field>
+            <field name="orders_count">2</field>
+            <field name="last_synced" eval="DateTime.now()"/>
+        </record>
+
+        <record id="shopify_customer_demo_2" model="shopify.customer">
+            <field name="name">Sarah Johnson</field>
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="shopify_customer_id">6234567890124</field>
+            <field name="partner_id" ref="res_partner_demo_customer_2"/>
+            <field name="email">sarah.johnson@example.com</field>
+            <field name="phone">+1 555-0102</field>
+            <field name="accepts_marketing" eval="False"/>
+            <field name="total_spent">79.99</field>
+            <field name="orders_count">1</field>
+            <field name="last_synced" eval="DateTime.now()"/>
+        </record>
+
+        <!-- Demo Orders -->
+        <record id="shopify_order_demo_1" model="shopify.order">
+            <field name="name">#1001</field>
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="shopify_order_id">5234567890123</field>
+            <field name="shopify_order_number">1001</field>
+            <field name="customer_id" ref="shopify_customer_demo_1"/>
+            <field name="order_date" eval="(DateTime.now() - timedelta(days=5))"/>
+            <field name="total_amount">79.99</field>
+            <field name="subtotal_amount">79.99</field>
+            <field name="total_tax">0.00</field>
+            <field name="total_shipping">0.00</field>
+            <field name="currency_id" ref="base.USD"/>
+            <field name="financial_status">paid</field>
+            <field name="fulfillment_status">unfulfilled</field>
+            <field name="state">draft</field>
+            <field name="imported" eval="False"/>
+        </record>
+
+        <record id="shopify_order_line_demo_1_1" model="shopify.order.line">
+            <field name="order_id" ref="shopify_order_demo_1"/>
+            <field name="product_id" ref="shopify_product_demo_1"/>
+            <field name="name">Wireless Headphones</field>
+            <field name="quantity">1</field>
+            <field name="price_unit">79.99</field>
+            <field name="price_subtotal">79.99</field>
+            <field name="shopify_line_id">12345001</field>
+        </record>
+
+        <record id="shopify_order_demo_2" model="shopify.order">
+            <field name="name">#1002</field>
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="shopify_order_id">5234567890124</field>
+            <field name="shopify_order_number">1002</field>
+            <field name="customer_id" ref="shopify_customer_demo_1"/>
+            <field name="order_date" eval="(DateTime.now() - timedelta(days=2))"/>
+            <field name="total_amount">74.98</field>
+            <field name="subtotal_amount">54.98</field>
+            <field name="total_tax">0.00</field>
+            <field name="total_shipping">20.00</field>
+            <field name="currency_id" ref="base.USD"/>
+            <field name="financial_status">paid</field>
+            <field name="fulfillment_status">fulfilled</field>
+            <field name="state">draft</field>
+            <field name="imported" eval="False"/>
+        </record>
+
+        <record id="shopify_order_line_demo_2_1" model="shopify.order.line">
+            <field name="order_id" ref="shopify_order_demo_2"/>
+            <field name="product_id" ref="shopify_product_demo_2"/>
+            <field name="name">Cotton T-Shirt</field>
+            <field name="quantity">1</field>
+            <field name="price_unit">24.99</field>
+            <field name="price_subtotal">24.99</field>
+            <field name="shopify_line_id">12345002</field>
+        </record>
+
+        <record id="shopify_order_line_demo_2_2" model="shopify.order.line">
+            <field name="order_id" ref="shopify_order_demo_2"/>
+            <field name="product_id" ref="shopify_product_demo_3"/>
+            <field name="name">Stainless Steel Water Bottle</field>
+            <field name="quantity">1</field>
+            <field name="price_unit">29.99</field>
+            <field name="price_subtotal">29.99</field>
+            <field name="shopify_line_id">12345003</field>
+        </record>
+
+        <!-- Demo Logs -->
+        <record id="shopify_log_demo_1" model="shopify.log">
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="operation">connection_test</field>
+            <field name="status">success</field>
+            <field name="message">Demo instance connection test successful</field>
+        </record>
+
+        <record id="shopify_log_demo_2" model="shopify.log">
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="operation">product_import</field>
+            <field name="status">success</field>
+            <field name="message">Successfully imported 3 demo products</field>
+            <field name="execution_time">1234.56</field>
+        </record>
+
+        <record id="shopify_log_demo_3" model="shopify.log">
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="operation">order_import</field>
+            <field name="status">success</field>
+            <field name="message">Successfully imported 2 demo orders</field>
+            <field name="execution_time">987.65</field>
+        </record>
+
+        <!-- Demo Queue Jobs -->
+        <record id="shopify_queue_demo_1" model="shopify.queue">
+            <field name="name">Import Products - Demo</field>
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="operation">import_products</field>
+            <field name="state">done</field>
+            <field name="priority">2</field>
+            <field name="total_records">3</field>
+            <field name="processed_records">3</field>
+            <field name="success_records">3</field>
+            <field name="failed_records">0</field>
+            <field name="execution_time">2.5</field>
+            <field name="finished_date" eval="DateTime.now()"/>
+        </record>
+
+        <record id="shopify_queue_demo_2" model="shopify.queue">
+            <field name="name">Sync Stock - Demo</field>
+            <field name="instance_id" ref="shopify_instance_demo"/>
+            <field name="operation">sync_stock</field>
+            <field name="state">queued</field>
+            <field name="priority">2</field>
+            <field name="scheduled_date" eval="DateTime.now() + timedelta(minutes=30)"/>
+        </record>
+
+    </data>
+</odoo>

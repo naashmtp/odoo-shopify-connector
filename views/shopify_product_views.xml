@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Shopify Product Form View -->
+    <record id="view_shopify_product_form" model="ir.ui.view">
+        <field name="name">shopify.product.form</field>
+        <field name="model">shopify.product</field>
+        <field name="arch" type="xml">
+            <form string="Shopify Product">
+                <header>
+                    <button name="action_sync_from_shopify" string="Import from Shopify" type="object" class="btn-primary"/>
+                    <button name="action_export_to_shopify" string="Export to Shopify" type="object" class="btn-primary"/>
+                    <button name="sync_stock_levels" string="Sync Stock Levels" type="object"/>
+                    <field name="status" widget="statusbar" statusbar_visible="active,archived,draft"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_odoo_product" type="object" class="oe_stat_button" icon="fa-product-hunt" attrs="{'invisible': [('product_id', '=', False)]}">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Odoo Product</span>
+                            </div>
+                        </button>
+                    </div>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Product Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="shopify_id" readonly="1"/>
+                            <field name="instance_id" required="1"/>
+                            <field name="product_id"/>
+                            <field name="template_id"/>
+                            <field name="vendor"/>
+                            <field name="product_type"/>
+                        </group>
+                        <group>
+                            <field name="tags" widget="many2many_tags"/>
+                            <field name="created_at_shopify" readonly="1"/>
+                            <field name="updated_at_shopify" readonly="1"/>
+                            <field name="published_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Synchronization Info">
+                            <field name="last_sync_date" readonly="1"/>
+                            <field name="sync_required"/>
+                            <field name="sync_error" readonly="1" attrs="{'invisible': [('sync_error', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Product description..."/>
+                        </page>
+                        <page string="Variants">
+                            <field name="variant_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="shopify_id"/>
+                                    <field name="sku"/>
+                                    <field name="barcode"/>
+                                    <field name="price"/>
+                                    <field name="compare_at_price"/>
+                                    <field name="inventory_quantity"/>
+                                    <field name="weight"/>
+                                    <field name="position"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Images">
+                            <field name="image_ids">
+                                <kanban>
+                                    <field name="name"/>
+                                    <field name="image_1920"/>
+                                    <field name="position"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div class="oe_kanban_global_click">
+                                                <div class="o_kanban_image">
+                                                    <img t-att-src="kanban_image('shopify.product.image', 'image_1920', record.id.raw_value)" alt="Product Image"/>
+                                                </div>
+                                                <div class="oe_kanban_details">
+                                                    <strong><field name="name"/></strong>
+                                                    <div>Position: <field name="position"/></div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+                        <page string="Technical Information">
+                            <group>
+                                <group>
+                                    <field name="shopify_handle" readonly="1"/>
+                                    <field name="admin_graphql_api_id" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="create_date" readonly="1"/>
+                                    <field name="write_date" readonly="1"/>
+                                    <field name="create_uid" readonly="1"/>
+                                    <field name="write_uid" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Shopify Product Tree View -->
+    <record id="view_shopify_product_tree" model="ir.ui.view">
+        <field name="name">shopify.product.tree</field>
+        <field name="model">shopify.product</field>
+        <field name="arch" type="xml">
+            <tree string="Shopify Products" decoration-danger="sync_required" decoration-muted="status == 'archived'">
+                <field name="name"/>
+                <field name="shopify_id"/>
+                <field name="instance_id"/>
+                <field name="vendor"/>
+                <field name="product_type"/>
+                <field name="status"/>
+                <field name="last_sync_date"/>
+                <field name="sync_required"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Shopify Product Kanban View -->
+    <record id="view_shopify_product_kanban" model="ir.ui.view">
+        <field name="name">shopify.product.kanban</field>
+        <field name="model">shopify.product</field>
+        <field name="arch" type="xml">
+            <kanban string="Shopify Products">
+                <field name="name"/>
+                <field name="shopify_id"/>
+                <field name="status"/>
+                <field name="image_1920"/>
+                <field name="vendor"/>
+                <field name="product_type"/>
+                <field name="last_sync_date"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('shopify.product', 'image_1920', record.id.raw_value)" alt="Product"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <ul>
+                                    <li t-if="record.vendor.raw_value">
+                                        <i class="fa fa-building-o"/> <field name="vendor"/>
+                                    </li>
+                                    <li t-if="record.product_type.raw_value">
+                                        <i class="fa fa-tag"/> <field name="product_type"/>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-clock-o"/> <field name="last_sync_date"/>
+                                    </li>
+                                </ul>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="status" widget="label_selection" options="{'classes': {'active': 'success', 'archived': 'default', 'draft': 'warning'}}"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="instance_id" widget="many2one_avatar_user"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Shopify Product Search View -->
+    <record id="view_shopify_product_search" model="ir.ui.view">
+        <field name="name">shopify.product.search</field>
+        <field name="model">shopify.product</field>
+        <field name="arch" type="xml">
+            <search string="Shopify Products">
+                <field name="name" string="Product" filter_domain="['|', ('name', 'ilike', self), ('shopify_id', 'ilike', self)]"/>
+                <field name="instance_id"/>
+                <field name="vendor"/>
+                <field name="product_type"/>
+                <field name="tags" filter_domain="[('tags', 'ilike', self)]"/>
+                <separator/>
+                <filter string="Sync Required" name="sync_required" domain="[('sync_required', '=', True)]"/>
+                <filter string="Active" name="active" domain="[('status', '=', 'active')]"/>
+                <filter string="Archived" name="archived" domain="[('status', '=', 'archived')]"/>
+                <filter string="Draft" name="draft" domain="[('status', '=', 'draft')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Instance" name="group_instance" context="{'group_by': 'instance_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Vendor" name="group_vendor" context="{'group_by': 'vendor'}"/>
+                    <filter string="Product Type" name="group_product_type" context="{'group_by': 'product_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Shopify Product Action -->
+    <record id="action_shopify_product" model="ir.actions.act_window">
+        <field name="name">Shopify Products</field>
+        <field name="res_model">shopify.product</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Shopify products yet!
+            </p>
+            <p>
+                Click on "Import from Shopify" to synchronize your products.
+            </p>
+        </field>
+    </record>
+
+    <!-- Shopify Product Variant Form View -->
+    <record id="view_shopify_product_variant_form" model="ir.ui.view">
+        <field name="name">shopify.product.variant.form</field>
+        <field name="model">shopify.product.variant</field>
+        <field name="arch" type="xml">
+            <form string="Shopify Product Variant">
+                <header>
+                    <button name="action_sync_from_shopify" string="Import from Shopify" type="object" class="btn-primary"/>
+                    <button name="action_export_to_shopify" string="Export to Shopify" type="object" class="btn-primary"/>
+                    <button name="action_sync_stock" string="Sync Stock" type="object"/>
+                </header>
+                <sheet>
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Variant Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="shopify_id" readonly="1"/>
+                            <field name="shopify_product_id" required="1"/>
+                            <field name="instance_id" required="1"/>
+                            <field name="product_id"/>
+                            <field name="sku"/>
+                            <field name="barcode"/>
+                        </group>
+                        <group>
+                            <field name="price"/>
+                            <field name="compare_at_price"/>
+                            <field name="cost"/>
+                            <field name="weight"/>
+                            <field name="weight_unit"/>
+                            <field name="position"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Inventory">
+                            <field name="inventory_item_id" readonly="1"/>
+                            <field name="inventory_quantity" readonly="1"/>
+                            <field name="inventory_policy"/>
+                            <field name="inventory_management"/>
+                            <field name="fulfillment_service"/>
+                        </group>
+                        <group string="Options">
+                            <field name="option1"/>
+                            <field name="option2"/>
+                            <field name="option3"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Availability">
+                            <field name="available"/>
+                            <field name="requires_shipping"/>
+                            <field name="taxable"/>
+                        </group>
+                        <group string="Synchronization">
+                            <field name="last_sync_date" readonly="1"/>
+                            <field name="sync_required"/>
+                            <field name="created_at_shopify" readonly="1"/>
+                            <field name="updated_at_shopify" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Technical Information">
+                        <field name="shopify_image_id" readonly="1"/>
+                        <field name="admin_graphql_api_id" readonly="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Shopify Product Variant Tree View -->
+    <record id="view_shopify_product_variant_tree" model="ir.ui.view">
+        <field name="name">shopify.product.variant.tree</field>
+        <field name="model">shopify.product.variant</field>
+        <field name="arch" type="xml">
+            <tree string="Shopify Product Variants" decoration-danger="sync_required" decoration-muted="available == False">
+                <field name="name"/>
+                <field name="shopify_id"/>
+                <field name="sku"/>
+                <field name="barcode"/>
+                <field name="price"/>
+                <field name="inventory_quantity"/>
+                <field name="available"/>
+                <field name="last_sync_date"/>
+                <field name="sync_required"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Shopify Product Variant Kanban View -->
+    <record id="view_shopify_product_variant_kanban" model="ir.ui.view">
+        <field name="name">shopify.product.variant.kanban</field>
+        <field name="model">shopify.product.variant</field>
+        <field name="arch" type="xml">
+            <kanban string="Shopify Product Variants">
+                <field name="name"/>
+                <field name="shopify_id"/>
+                <field name="sku"/>
+                <field name="price"/>
+                <field name="inventory_quantity"/>
+                <field name="image_1920"/>
+                <field name="available"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('shopify.product.variant', 'image_1920', record.id.raw_value)" alt="Variant"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <ul>
+                                    <li t-if="record.sku.raw_value">
+                                        SKU: <field name="sku"/>
+                                    </li>
+                                    <li>
+                                        Price: <field name="price"/>
+                                    </li>
+                                    <li>
+                                        Stock: <field name="inventory_quantity"/>
+                                    </li>
+                                </ul>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="available" widget="boolean"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Shopify Product Variant Search View -->
+    <record id="view_shopify_product_variant_search" model="ir.ui.view">
+        <field name="name">shopify.product.variant.search</field>
+        <field name="model">shopify.product.variant</field>
+        <field name="arch" type="xml">
+            <search string="Shopify Product Variants">
+                <field name="name" string="Variant" filter_domain="['|', '|', ('name', 'ilike', self), ('sku', 'ilike', self), ('barcode', 'ilike', self)]"/>
+                <field name="shopify_product_id"/>
+                <field name="instance_id"/>
+                <separator/>
+                <filter string="Available" name="available" domain="[('available', '=', True)]"/>
+                <filter string="Sync Required" name="sync_required" domain="[('sync_required', '=', True)]"/>
+                <filter string="Out of Stock" name="out_of_stock" domain="[('inventory_quantity', '&lt;=', 0)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Product" name="group_product" context="{'group_by': 'shopify_product_id'}"/>
+                    <filter string="Instance" name="group_instance" context="{'group_by': 'instance_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Shopify Product Variant Action -->
+    <record id="action_shopify_product_variant" model="ir.actions.act_window">
+        <field name="name">Shopify Product Variants</field>
+        <field name="res_model">shopify.product.variant</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No product variants found!
+            </p>
+        </field>
+    </record>
+
+    <!-- Shopify Product Image Form View -->
+    <record id="view_shopify_product_image_form" model="ir.ui.view">
+        <field name="name">shopify.product.image.form</field>
+        <field name="model">shopify.product.image</field>
+        <field name="arch" type="xml">
+            <form string="Shopify Product Image">
+                <header>
+                    <button name="action_sync_from_shopify" string="Import from Shopify" type="object" class="btn-primary"/>
+                    <button name="action_export_to_shopify" string="Export to Shopify" type="object" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <field name="image_1920" widget="image" class="oe_avatar" options="{'size': [512, 512]}"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Image Name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="shopify_id" readonly="1"/>
+                            <field name="shopify_product_id" required="1"/>
+                            <field name="instance_id" required="1"/>
+                            <field name="position"/>
+                            <field name="alt_text"/>
+                        </group>
+                        <group>
+                            <field name="src" readonly="1" widget="url"/>
+                            <field name="width" readonly="1"/>
+                            <field name="height" readonly="1"/>
+                            <field name="created_at_shopify" readonly="1"/>
+                            <field name="updated_at_shopify" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Linked Variants">
+                            <field name="variant_ids" widget="many2many_tags"/>
+                        </group>
+                        <group string="Synchronization">
+                            <field name="last_sync_date" readonly="1"/>
+                            <field name="sync_required"/>
+                        </group>
+                    </group>
+                    <group string="Technical Information">
+                        <field name="admin_graphql_api_id" readonly="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Shopify Product Image Tree View -->
+    <record id="view_shopify_product_image_tree" model="ir.ui.view">
+        <field name="name">shopify.product.image.tree</field>
+        <field name="model">shopify.product.image</field>
+        <field name="arch" type="xml">
+            <tree string="Shopify Product Images" decoration-danger="sync_required">
+                <field name="image_1920" widget="image" options="{'size': [64, 64]}"/>
+                <field name="name"/>
+                <field name="shopify_id"/>
+                <field name="shopify_product_id"/>
+                <field name="position"/>
+                <field name="width"/>
+                <field name="height"/>
+                <field name="last_sync_date"/>
+                <field name="sync_required"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Shopify Product Image Kanban View -->
+    <record id="view_shopify_product_image_kanban" model="ir.ui.view">
+        <field name="name">shopify.product.image.kanban</field>
+        <field name="model">shopify.product.image</field>
+        <field name="arch" type="xml">
+            <kanban string="Shopify Product Images">
+                <field name="name"/>
+                <field name="shopify_id"/>
+                <field name="position"/>
+                <field name="image_1920"/>
+                <field name="width"/>
+                <field name="height"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('shopify.product.image', 'image_1920', record.id.raw_value)" alt="Product Image"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <ul>
+                                    <li>Position: <field name="position"/></li>
+                                    <li t-if="record.width.raw_value and record.height.raw_value">
+                                        Size: <field name="width"/> x <field name="height"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Shopify Product Image Search View -->
+    <record id="view_shopify_product_image_search" model="ir.ui.view">
+        <field name="name">shopify.product.image.search</field>
+        <field name="model">shopify.product.image</field>
+        <field name="arch" type="xml">
+            <search string="Shopify Product Images">
+                <field name="name"/>
+                <field name="shopify_product_id"/>
+                <field name="instance_id"/>
+                <separator/>
+                <filter string="Sync Required" name="sync_required" domain="[('sync_required', '=', True)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Product" name="group_product" context="{'group_by': 'shopify_product_id'}"/>
+                    <filter string="Instance" name="group_instance" context="{'group_by': 'instance_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Shopify Product Image Action -->
+    <record id="action_shopify_product_image" model="ir.actions.act_window">
+        <field name="name">Shopify Product Images</field>
+        <field name="res_model">shopify.product.image</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No product images found!
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_shopify_products" name="Products" parent="menu_shopify_root" sequence="10"/>
+
+    <menuitem id="menu_shopify_product_main"
+              name="Products"
+              parent="menu_shopify_products"
+              action="action_shopify_product"
+              sequence="1"/>
+
+    <menuitem id="menu_shopify_product_variant"
+              name="Variants"
+              parent="menu_shopify_products"
+              action="action_shopify_product_variant"
+              sequence="2"/>
+
+    <menuitem id="menu_shopify_product_image"
+              name="Images"
+              parent="menu_shopify_products"
+              action="action_shopify_product_image"
+              sequence="3"/>
+
+</odoo>

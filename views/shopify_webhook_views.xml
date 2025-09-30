@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Shopify Webhook Tree View -->
+    <record id="view_shopify_webhook_tree" model="ir.ui.view">
+        <field name="name">shopify.webhook.tree</field>
+        <field name="model">shopify.webhook</field>
+        <field name="arch" type="xml">
+            <tree string="Shopify Webhooks" decoration-success="state=='active'" decoration-danger="state=='error'" decoration-muted="state=='inactive'">
+                <field name="topic"/>
+                <field name="shopify_id"/>
+                <field name="instance_id"/>
+                <field name="address"/>
+                <field name="format"/>
+                <field name="state" widget="badge" decoration-success="state=='active'" decoration-danger="state=='error'" decoration-muted="state=='inactive'"/>
+                <field name="total_calls"/>
+                <field name="successful_calls" sum="Total Successful"/>
+                <field name="failed_calls" sum="Total Failed"/>
+                <field name="last_call"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Shopify Webhook Form View -->
+    <record id="view_shopify_webhook_form" model="ir.ui.view">
+        <field name="name">shopify.webhook.form</field>
+        <field name="model">shopify.webhook</field>
+        <field name="arch" type="xml">
+            <form string="Shopify Webhook">
+                <header>
+                    <button name="action_test_webhook" type="object" string="Test Webhook" class="oe_highlight" icon="fa-play"/>
+                    <field name="state" widget="statusbar" statusbar_visible="active,inactive,error"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_logs" icon="fa-list-ul">
+                            <field name="total_calls" widget="statinfo" string="Total Calls"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="topic" placeholder="e.g. orders/create"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Basic Information">
+                            <field name="instance_id" options="{'no_create': True}"/>
+                            <field name="shopify_id" readonly="1"/>
+                            <field name="address" placeholder="https://your-domain.com/shopify/webhook"/>
+                            <field name="format"/>
+                            <field name="api_version"/>
+                        </group>
+                        <group string="Configuration">
+                            <field name="fields_to_include" placeholder="Comma-separated field names"/>
+                            <field name="metafield_namespaces" placeholder="Comma-separated namespaces"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Configuration" name="configuration">
+                            <group>
+                                <group string="Webhook Details">
+                                    <field name="topic"/>
+                                    <field name="address"/>
+                                    <field name="format"/>
+                                </group>
+                                <group string="Advanced Settings">
+                                    <field name="api_version"/>
+                                    <field name="fields_to_include"/>
+                                    <field name="metafield_namespaces"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Statistics" name="statistics">
+                            <group>
+                                <group string="Call Statistics">
+                                    <field name="total_calls" readonly="1"/>
+                                    <field name="successful_calls" readonly="1"/>
+                                    <field name="failed_calls" readonly="1"/>
+                                    <field name="last_call" readonly="1"/>
+                                </group>
+                                <group string="Success Rate">
+                                    <label for="id" string="Success Rate"/>
+                                    <div>
+                                        <field name="successful_calls" class="oe_inline" readonly="1"/> /
+                                        <field name="total_calls" class="oe_inline" readonly="1"/>
+                                        <span class="o_form_label" attrs="{'invisible': [('total_calls', '=', 0)]}">
+                                            (<field name="successful_calls" class="oe_inline" readonly="1"/> calls succeeded)
+                                        </span>
+                                    </div>
+                                </group>
+                            </group>
+                            <separator string="Performance Metrics"/>
+                            <group>
+                                <group>
+                                    <label for="id" string="Average Success Rate"/>
+                                    <div attrs="{'invisible': [('total_calls', '=', 0)]}">
+                                        <span class="o_stat_value">
+                                            <field name="successful_calls" invisible="1"/>
+                                            <field name="total_calls" invisible="1"/>
+                                        </span>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Logs" name="logs">
+                            <field name="log_ids" mode="tree">
+                                <tree string="Webhook Logs" decoration-success="status=='success'" decoration-danger="status=='error'" decoration-warning="status=='failed'" decoration-info="status=='processing'">
+                                    <field name="create_date"/>
+                                    <field name="topic"/>
+                                    <field name="status" widget="badge" decoration-success="status=='success'" decoration-danger="status=='error'" decoration-warning="status=='failed'" decoration-info="status=='processing'"/>
+                                    <field name="processing_time" widget="float_time"/>
+                                    <field name="error_message"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Shopify Webhook Search View -->
+    <record id="view_shopify_webhook_search" model="ir.ui.view">
+        <field name="name">shopify.webhook.search</field>
+        <field name="model">shopify.webhook</field>
+        <field name="arch" type="xml">
+            <search string="Search Webhooks">
+                <field name="topic"/>
+                <field name="shopify_id"/>
+                <field name="instance_id"/>
+                <field name="address"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('state', '=', 'active')]"/>
+                <filter string="Inactive" name="inactive" domain="[('state', '=', 'inactive')]"/>
+                <filter string="Error" name="error" domain="[('state', '=', 'error')]"/>
+                <separator/>
+                <filter string="Has Failures" name="has_failures" domain="[('failed_calls', '>', 0)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Instance" name="group_instance" context="{'group_by': 'instance_id'}"/>
+                    <filter string="Topic" name="group_topic" context="{'group_by': 'topic'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Format" name="group_format" context="{'group_by': 'format'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Shopify Webhook Log Tree View -->
+    <record id="view_shopify_webhook_log_tree" model="ir.ui.view">
+        <field name="name">shopify.webhook.log.tree</field>
+        <field name="model">shopify.webhook.log</field>
+        <field name="arch" type="xml">
+            <tree string="Webhook Logs" decoration-success="status=='success'" decoration-danger="status=='error'" decoration-warning="status=='failed'" decoration-info="status=='processing'">
+                <field name="create_date"/>
+                <field name="webhook_id"/>
+                <field name="topic"/>
+                <field name="status" widget="badge" decoration-success="status=='success'" decoration-danger="status=='error'" decoration-warning="status=='failed'" decoration-info="status=='processing'"/>
+                <field name="processing_time" widget="float_time" sum="Total Time"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Shopify Webhook Log Form View -->
+    <record id="view_shopify_webhook_log_form" model="ir.ui.view">
+        <field name="name">shopify.webhook.log.form</field>
+        <field name="model">shopify.webhook.log</field>
+        <field name="arch" type="xml">
+            <form string="Webhook Log">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="processing,success,failed,error"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="topic"/>
+                        </h1>
+                        <h2>
+                            <field name="webhook_id" readonly="1"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Information">
+                            <field name="create_date" readonly="1"/>
+                            <field name="status"/>
+                            <field name="processing_time" widget="float_time"/>
+                        </group>
+                        <group string="Details">
+                            <field name="webhook_id"/>
+                            <field name="topic"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Request Data" name="data">
+                            <group>
+                                <field name="data" widget="ace" options="{'mode': 'json'}" nolabel="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Headers" name="headers">
+                            <group>
+                                <field name="headers" widget="ace" options="{'mode': 'json'}" nolabel="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Response" name="response">
+                            <group>
+                                <field name="response" widget="text" nolabel="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Error Details" name="error" attrs="{'invisible': [('status', 'not in', ['error', 'failed'])]}">
+                            <group>
+                                <field name="error_message" widget="text" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Shopify Webhook Log Search View -->
+    <record id="view_shopify_webhook_log_search" model="ir.ui.view">
+        <field name="name">shopify.webhook.log.search</field>
+        <field name="model">shopify.webhook.log</field>
+        <field name="arch" type="xml">
+            <search string="Search Webhook Logs">
+                <field name="webhook_id"/>
+                <field name="topic"/>
+                <field name="create_date"/>
+                <separator/>
+                <filter string="Success" name="success" domain="[('status', '=', 'success')]"/>
+                <filter string="Failed" name="failed" domain="[('status', '=', 'failed')]"/>
+                <filter string="Error" name="error" domain="[('status', '=', 'error')]"/>
+                <filter string="Processing" name="processing" domain="[('status', '=', 'processing')]"/>
+                <separator/>
+                <filter string="Today" name="today" domain="[('create_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                <filter string="Last 7 Days" name="last_7_days" domain="[('create_date', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Last 30 Days" name="last_30_days" domain="[('create_date', '&gt;=', (context_today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Webhook" name="group_webhook" context="{'group_by': 'webhook_id'}"/>
+                    <filter string="Topic" name="group_topic" context="{'group_by': 'topic'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Shopify Webhook Action -->
+    <record id="action_shopify_webhook" model="ir.actions.act_window">
+        <field name="name">Webhooks</field>
+        <field name="res_model">shopify.webhook</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Shopify Webhook
+            </p>
+            <p>
+                Webhooks allow you to receive real-time notifications from Shopify when specific events occur in your store.
+            </p>
+        </field>
+    </record>
+
+    <!-- Shopify Webhook Log Action -->
+    <record id="action_shopify_webhook_log" model="ir.actions.act_window">
+        <field name="name">Webhook Logs</field>
+        <field name="res_model">shopify.webhook.log</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_last_30_days': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No webhook logs yet
+            </p>
+            <p>
+                Webhook logs will appear here once your webhooks start receiving events from Shopify.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_shopify_webhook"
+              name="Webhooks"
+              parent="menu_shopify_operations"
+              action="action_shopify_webhook"
+              sequence="30"/>
+
+    <menuitem id="menu_shopify_webhook_log"
+              name="Webhook Logs"
+              parent="menu_shopify_operations"
+              action="action_shopify_webhook_log"
+              sequence="31"/>
+
+</odoo>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Actions for main models -->
+
+        <!-- Shopify Instance Actions -->
+        <record id="action_shopify_instance" model="ir.actions.act_window">
+            <field name="name">Shopify Instances</field>
+            <field name="res_model">shopify.instance</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first Shopify Instance
+                </p>
+                <p>
+                    Connect your Shopify store to start synchronizing products, orders, and customers.
+                </p>
+            </field>
+        </record>
+
+        <!-- Shopify Product Actions -->
+        <record id="action_shopify_product" model="ir.actions.act_window">
+            <field name="name">Shopify Products</field>
+            <field name="res_model">shopify.product</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No products synchronized yet
+                </p>
+                <p>
+                    Import products from Shopify or export your Odoo products to Shopify.
+                </p>
+            </field>
+        </record>
+
+        <!-- Shopify Order Actions -->
+        <record id="action_shopify_order" model="ir.actions.act_window">
+            <field name="name">Shopify Orders</field>
+            <field name="res_model">shopify.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_pending': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No orders imported yet
+                </p>
+                <p>
+                    Orders from Shopify will appear here automatically when imported.
+                </p>
+            </field>
+        </record>
+
+        <!-- Shopify Customer Actions -->
+        <record id="action_shopify_customer" model="ir.actions.act_window">
+            <field name="name">Shopify Customers</field>
+            <field name="res_model">shopify.customer</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No customers synchronized yet
+                </p>
+                <p>
+                    Import customers from Shopify to synchronize contact information.
+                </p>
+            </field>
+        </record>
+
+        <!-- Shopify Queue Actions -->
+        <record id="action_shopify_queue" model="ir.actions.act_window">
+            <field name="name">Queue Jobs</field>
+            <field name="res_model">shopify.queue</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_pending': 1, 'search_default_in_progress': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No queue jobs
+                </p>
+                <p>
+                    Background jobs for synchronization will appear here.
+                </p>
+            </field>
+        </record>
+
+        <!-- Shopify Log Actions -->
+        <record id="action_shopify_log" model="ir.actions.act_window">
+            <field name="name">Logs</field>
+            <field name="res_model">shopify.log</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_errors': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No logs yet
+                </p>
+                <p>
+                    Synchronization logs and errors will appear here.
+                </p>
+            </field>
+        </record>
+
+        <!-- Shopify Webhook Actions -->
+        <record id="action_shopify_webhook" model="ir.actions.act_window">
+            <field name="name">Webhooks</field>
+            <field name="res_model">shopify.webhook</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No webhooks configured
+                </p>
+                <p>
+                    Webhooks enable real-time synchronization with Shopify.
+                </p>
+            </field>
+        </record>
+
+        <!-- Main Menu -->
+        <menuitem id="menu_shopify_root"
+                  name="Shopify"
+                  web_icon="shopify_integration,static/description/icon.png"
+                  sequence="10"/>
+
+        <!-- Configuration Menu -->
+        <menuitem id="menu_shopify_configuration"
+                  name="Configuration"
+                  parent="menu_shopify_root"
+                  sequence="10"/>
+
+        <menuitem id="menu_shopify_instances"
+                  name="Instances"
+                  parent="menu_shopify_configuration"
+                  action="action_shopify_instance"
+                  sequence="10"/>
+
+        <menuitem id="menu_shopify_webhooks"
+                  name="Webhooks"
+                  parent="menu_shopify_configuration"
+                  action="action_shopify_webhook"
+                  sequence="20"/>
+
+        <!-- Operations Menu -->
+        <menuitem id="menu_shopify_operations"
+                  name="Operations"
+                  parent="menu_shopify_root"
+                  sequence="20"/>
+
+        <menuitem id="menu_shopify_products"
+                  name="Products"
+                  parent="menu_shopify_operations"
+                  action="action_shopify_product"
+                  sequence="10"/>
+
+        <menuitem id="menu_shopify_orders"
+                  name="Orders"
+                  parent="menu_shopify_operations"
+                  action="action_shopify_order"
+                  sequence="20"/>
+
+        <menuitem id="menu_shopify_customers"
+                  name="Customers"
+                  parent="menu_shopify_operations"
+                  action="action_shopify_customer"
+                  sequence="30"/>
+
+        <menuitem id="menu_shopify_queue"
+                  name="Queue"
+                  parent="menu_shopify_operations"
+                  action="action_shopify_queue"
+                  sequence="40"/>
+
+        <menuitem id="menu_shopify_logs"
+                  name="Logs"
+                  parent="menu_shopify_operations"
+                  action="action_shopify_log"
+                  sequence="50"/>
+
+        <!-- Tools Menu -->
+        <menuitem id="menu_shopify_tools"
+                  name="Tools"
+                  parent="menu_shopify_root"
+                  sequence="30"/>
+
+        <menuitem id="menu_shopify_onboarding"
+                  name="Setup Wizard"
+                  parent="menu_shopify_tools"
+                  action="action_shopify_onboarding_wizard"
+                  sequence="10"/>
+
+        <menuitem id="menu_shopify_import_export"
+                  name="Import/Export"
+                  parent="menu_shopify_tools"
+                  action="action_shopify_import_export_wizard"
+                  sequence="20"/>
+
+        <menuitem id="menu_shopify_sync"
+                  name="Synchronize"
+                  parent="menu_shopify_tools"
+                  action="action_shopify_sync_wizard"
+                  sequence="30"/>
+
+        <!-- Reports Menu -->
+        <menuitem id="menu_shopify_reports"
+                  name="Reports"
+                  parent="menu_shopify_root"
+                  sequence="40"/>
+
+        <!-- Dashboard will be added later -->
+        <!-- <menuitem id="menu_shopify_dashboard"
+                  name="Dashboard"
+                  parent="menu_shopify_reports"
+                  sequence="10"/> -->
+
+    </data>
+</odoo>

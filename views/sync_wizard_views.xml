@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Shopify Sync Wizard Form View -->
+        <record id="view_shopify_sync_wizard_form" model="ir.ui.view">
+            <field name="name">shopify.sync.wizard.form</field>
+            <field name="model">shopify.sync.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Shopify Synchronization">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>Synchronize with Shopify</h1>
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name="instance_id" options="{'no_create': True}"/>
+                            </group>
+                        </group>
+
+                        <group string="Sync Options">
+                            <group>
+                                <field name="sync_products"/>
+                                <field name="sync_orders"/>
+                            </group>
+                            <group>
+                                <field name="sync_customers"/>
+                                <field name="sync_stock"/>
+                            </group>
+                        </group>
+
+                        <group string="Advanced Options">
+                            <group>
+                                <field name="force_update"/>
+                                <field name="use_queue"/>
+                            </group>
+                        </group>
+
+                        <group string="Statistics">
+                            <group>
+                                <field name="product_count" readonly="1" attrs="{'invisible': [('sync_products', '=', False)]}"/>
+                                <field name="order_count" readonly="1" attrs="{'invisible': [('sync_orders', '=', False)]}"/>
+                            </group>
+                            <group>
+                                <field name="customer_count" readonly="1" attrs="{'invisible': [('sync_customers', '=', False)]}"/>
+                            </group>
+                        </group>
+
+                        <group colspan="2">
+                            <div class="alert alert-warning" role="alert" attrs="{'invisible': [('use_queue', '=', True)]}">
+                                <strong>Warning:</strong> Running sync without queue may take a long time and block the interface.
+                                It is recommended to use the queue for large synchronizations.
+                            </div>
+                        </group>
+
+                        <separator string="Quick Actions"/>
+                        <group>
+                            <button name="action_sync_products_only" string="Sync Products Only"
+                                    type="object" class="btn-info oe_inline"/>
+                            <button name="action_sync_orders_only" string="Sync Orders Only"
+                                    type="object" class="btn-info oe_inline"/>
+                            <button name="action_sync_customers_only" string="Sync Customers Only"
+                                    type="object" class="btn-info oe_inline"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_sync_all" string="Sync All" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Wizard Action -->
+        <record id="action_shopify_sync_wizard" model="ir.actions.act_window">
+            <field name="name">Synchronize</field>
+            <field name="res_model">shopify.sync.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

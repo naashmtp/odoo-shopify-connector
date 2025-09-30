@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopify Integration - Complete Connector for Odoo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #5cb85c 0%, #4cae4c 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .header .version {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        /* Features Section */
+        .section {
+            padding: 60px 0;
+            background: white;
+        }
+
+        .section:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .section h2 {
+            font-size: 36px;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .section:nth-child(even) .feature-card {
+            background: white;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .feature-card p {
+            color: #7f8c8d;
+            font-size: 15px;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .feature-card li {
+            padding: 8px 0 8px 25px;
+            position: relative;
+            color: #7f8c8d;
+        }
+
+        .feature-card li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #5cb85c;
+            font-weight: bold;
+        }
+
+        /* Key Features */
+        .key-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .key-feature {
+            display: flex;
+            align-items: start;
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .key-feature-icon {
+            font-size: 32px;
+            min-width: 50px;
+        }
+
+        .key-feature-content h4 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .key-feature-content p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* Installation Steps */
+        .steps {
+            display: grid;
+            gap: 20px;
+        }
+
+        .step {
+            display: flex;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: #5cb85c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .step-content p {
+            color: #7f8c8d;
+        }
+
+        /* Pricing */
+        .pricing-badge {
+            display: inline-block;
+            background: #5cb85c;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, #5cb85c 0%, #4cae4c 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .cta p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #5cb85c;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #5cb85c;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .section h2 {
+                font-size: 28px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .key-features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="container">
+            <h1>🛍️ Shopify Integration</h1>
+            <p>Solution complète d'intégration Shopify pour Odoo. Synchronisez vos produits, commandes et clients en temps réel.</p>
+            <div class="version">Version 16.0 • Compatible Odoo 16+</div>
+        </div>
+    </div>
+
+    <!-- Main Features -->
+    <div class="section">
+        <div class="container">
+            <h2>Fonctionnalités Principales</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">📦</span>
+                    <h3>Gestion des Produits</h3>
+                    <ul>
+                        <li>Import/Export automatique</li>
+                        <li>Synchronisation des variantes</li>
+                        <li>Gestion des images</li>
+                        <li>Mapping par SKU</li>
+                        <li>Sync des stocks multi-entrepôts</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">🛒</span>
+                    <h3>Gestion des Commandes</h3>
+                    <ul>
+                        <li>Import automatique</li>
+                        <li>Workflow automatisé</li>
+                        <li>Suivi des statuts</li>
+                        <li>Gestion des expéditions</li>
+                        <li>Commandes partielles</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">👥</span>
+                    <h3>Gestion des Clients</h3>
+                    <ul>
+                        <li>Synchronisation bidirectionnelle</li>
+                        <li>Import des adresses</li>
+                        <li>Gestion des tags</li>
+                        <li>Segmentation clients</li>
+                        <li>Historique d'achats</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">💳</span>
+                    <h3>Gestion Financière</h3>
+                    <ul>
+                        <li>Import des paiements</li>
+                        <li>Réconciliation automatique</li>
+                        <li>Gestion des remboursements</li>
+                        <li>Création de factures</li>
+                        <li>Multi-devises</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">🔔</span>
+                    <h3>Webhooks Temps Réel</h3>
+                    <ul>
+                        <li>Configuration automatique</li>
+                        <li>Validation des signatures</li>
+                        <li>Traitement asynchrone</li>
+                        <li>Retry automatique</li>
+                        <li>Logging complet</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">📊</span>
+                    <h3>Rapports & Analytics</h3>
+                    <ul>
+                        <li>Dashboard en temps réel</li>
+                        <li>KPI de ventes</li>
+                        <li>Analyse des performances</li>
+                        <li>Rapports personnalisés</li>
+                        <li>Export de données</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technical Features -->
+    <div class="section">
+        <div class="container">
+            <h2>Caractéristiques Techniques</h2>
+            <div class="key-features">
+                <div class="key-feature">
+                    <div class="key-feature-icon">🔐</div>
+                    <div class="key-feature-content">
+                        <h4>Authentification OAuth</h4>
+                        <p>Connexion sécurisée via OAuth 2.0 avec gestion automatique des tokens</p>
+                    </div>
+                </div>
+
+                <div class="key-feature">
+                    <div class="key-feature-icon">⚡</div>
+                    <div class="key-feature-content">
+                        <h4>File d'Attente Intelligente</h4>
+                        <p>Système de queue avec retry automatique et gestion des erreurs</p>
+                    </div>
+                </div>
+
+                <div class="key-feature">
+                    <div class="key-feature-icon">🏪</div>
+                    <div class="key-feature-content">
+                        <h4>Multi-Boutiques</h4>
+                        <p>Gérez plusieurs instances Shopify depuis un seul Odoo</p>
+                    </div>
+                </div>
+
+                <div class="key-feature">
+                    <div class="key-feature-icon">🔄</div>
+                    <div class="key-feature-content">
+                        <h4>Synchronisation Bidirectionnelle</h4>
+                        <p>Sync automatique dans les deux sens avec détection des conflits</p>
+                    </div>
+                </div>
+
+                <div class="key-feature">
+                    <div class="key-feature-icon">📝</div>
+                    <div class="key-feature-content">
+                        <h4>Logging Avancé</h4>
+                        <p>Traçabilité complète de toutes les opérations avec niveaux de log</p>
+                    </div>
+                </div>
+
+                <div class="key-feature">
+                    <div class="key-feature-icon">⏰</div>
+                    <div class="key-feature-content">
+                        <h4>Planificateurs Automatiques</h4>
+                        <p>Cron jobs configurables pour synchronisations périodiques</p>
+                    </div>
+                </div>
+
+                <div class="key-feature">
+                    <div class="key-feature-icon">🌍</div>
+                    <div class="key-feature-content">
+                        <h4>Multi-Langues & Devises</h4>
+                        <p>Support complet des boutiques internationales</p>
+                    </div>
+                </div>
+
+                <div class="key-feature">
+                    <div class="key-feature-icon">🔧</div>
+                    <div class="key-feature-content">
+                        <h4>API Complète</h4>
+                        <p>Intégration avec l'API Shopify Admin et GraphQL</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Installation -->
+    <div class="section">
+        <div class="container">
+            <h2>Installation Simple</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Installez le module</h4>
+                        <p>Copiez le module dans votre dossier addons et installez-le depuis Apps</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Configurez votre instance Shopify</h4>
+                        <p>Ajoutez vos clés API et shop URL via l'assistant de configuration</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Testez la connexion</h4>
+                        <p>Vérifiez que la connexion fonctionne correctement</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Lancez la synchronisation</h4>
+                        <p>Importez vos données et configurez les mappings selon vos besoins</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing -->
+    <div class="section" style="text-align: center;">
+        <div class="container">
+            <h2>Prix Compétitif</h2>
+            <p style="font-size: 18px; color: #7f8c8d; margin-bottom: 20px;">
+                Solution complète à un prix qui casse le marché
+            </p>
+            <div class="pricing-badge">💰 Prix sur Demande</div>
+            <p style="margin-top: 20px; color: #7f8c8d;">
+                Contactez-nous pour une offre personnalisée selon vos besoins
+            </p>
+        </div>
+    </div>
+
+    <!-- Support -->
+    <div class="section">
+        <div class="container">
+            <h2>Support & Documentation</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">📚</span>
+                    <h3>Documentation Complète</h3>
+                    <p>Guides détaillés d'installation, configuration et utilisation avec exemples pratiques</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">💬</span>
+                    <h3>Support Technique</h3>
+                    <p>Équipe dédiée pour vous accompagner dans votre intégration et résoudre vos problèmes</p>
+                </div>
+
+                <div class="feature-card">
+                    <span class="feature-icon">🔄</span>
+                    <h3>Mises à Jour Régulières</h3>
+                    <p>Évolutions continues avec nouvelles fonctionnalités et corrections de bugs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta">
+        <div class="container">
+            <h2>Prêt à démarrer ?</h2>
+            <p>Intégrez votre boutique Shopify avec Odoo en quelques minutes</p>
+            <a href="https://github.com/naashmtp/odoo-shopify-connector" class="cta-button">Télécharger Maintenant</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <p>Shopify Integration pour Odoo 16 • Version 1.0.0</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/naashmtp/odoo-shopify-connector">GitHub</a> •
+                <a href="mailto:support@example.com">Support</a> •
+                <a href="#">Documentation</a>
+            </p>
+            <p style="margin-top: 20px; font-size: 14px; opacity: 0.8;">
+                Développé avec ❤️ pour la communauté Odoo
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
