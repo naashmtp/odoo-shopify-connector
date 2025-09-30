@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { Component, useState, onWillStart, onMounted } from "@odoo/owl";
+import { Component, useState, onWillStart, onMounted, onWillUnmount } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class ShopifyDashboard extends Component {
@@ -31,6 +31,12 @@ export class ShopifyDashboard extends Component {
 
         onMounted(() => {
             this.startAutoRefresh();
+        });
+
+        onWillUnmount(() => {
+            if (this.refreshInterval) {
+                clearInterval(this.refreshInterval);
+            }
         });
     }
 
@@ -70,12 +76,6 @@ export class ShopifyDashboard extends Component {
         this.refreshInterval = setInterval(() => {
             this.loadDashboardData();
         }, 30000); // Refresh every 30 seconds
-    }
-
-    willUnmount() {
-        if (this.refreshInterval) {
-            clearInterval(this.refreshInterval);
-        }
     }
 
     async openOrders() {

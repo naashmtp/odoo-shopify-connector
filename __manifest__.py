@@ -1,6 +1,6 @@
 {
     'name': 'Shopify Integration',
-    'version': '16.0.1.0.0',
+    'version': '17.0.1.0.0',
     'category': 'Sales/E-commerce',
     'summary': 'Complete Shopify integration for Odoo',
     'description': """
@@ -61,9 +61,9 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'shopify_integration/static/src/js/**/*',
-            'shopify_integration/static/src/css/**/*',
-            'shopify_integration/static/src/xml/**/*',
+            'shopify_integration/static/src/js/shopify_dashboard.js',
+            'shopify_integration/static/src/css/**/*.css',
+            'shopify_integration/static/src/xml/**/*.xml',
         ],
     },
     'demo': [
